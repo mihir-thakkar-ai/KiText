@@ -8,6 +8,10 @@
 #include<errno.h>
 #include<stdio.h>
 
+/***defines***/
+
+#define CTRL_KEY(k) ((k) & 0x1f)
+
 
 /*** data ***/
 struct termios orig_termios;
@@ -20,13 +24,14 @@ void die(const char* s) {
 	exit(1);
 }
 void disableRawMode() {
+	
 	if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios) == -1) die("tcsetattr");
-	// tcsetattr(STDIN_FILENO, TCSAFLUSH, &orig_termios);
+	
 }
 void enableRawMode() {
 
 	if (tcgetattr(STDIN_FILENO, &orig_termios) == -1) die("tcgetattr");
-	// tcgetattr(STDIN_FILENO, &orig_termios);
+	
 	atexit(disableRawMode);
 	
 	struct termios raw=orig_termios;
@@ -39,6 +44,7 @@ void enableRawMode() {
 	if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw)==-1) die("tcsetattr"); // TCSAFLUSH: Change attributes when output has drained; also flush pending input.
 
 }
+
 
 /*** init ***/
 
@@ -56,7 +62,7 @@ int main() {
 
 			printf("%d ('%c')\r\n", c, c);
 		}
-		if (c == 'q')
+		if (c == CTRL_KEY('q'))
 			break;
 
 
